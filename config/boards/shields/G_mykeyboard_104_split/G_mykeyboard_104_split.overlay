@@ -1,0 +1,194 @@
+#include <dt-bindings/zmk/matrix_transform.h>
+
+/ {
+    chosen {
+        zmk,kscan = &kscan0;
+    };
+
+    // 1번 엔코더 정의 (D15=A, D14=B)
+    encoder_1: encoder_1 {
+        compatible = "alps,ec11";
+        a-gpios = <&pro_micro 15 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        b-gpios = <&pro_micro 14 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        steps = <80>;
+    };
+
+    // 2번 엔코더 정의 (D16=A, D10=B)
+    encoder_2: encoder_2 {
+        compatible = "alps,ec11";
+        a-gpios = <&pro_micro 16 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        b-gpios = <&pro_micro 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        steps = <80>;
+    };
+
+    sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&encoder_1 &encoder_2>;
+        triggers-per-rotation = <20>;
+    };
+
+    // 통합 키 매트릭스 스캔 설정 (가로로 분할 보드들을 이어 붙이는 방식)
+    kscan0: kscan {
+        compatible = "zmk,kscan-composite";
+        label = "KSCAN";
+        rows = <6>;
+        columns = <24>;
+
+        // 1. 메인 키보드 왼쪽 (주소 0x23)
+        matrix_main_left {
+            kscan = <&kscan_main_left>;
+            row-offset = <0>;
+            col-offset = <0>;
+        };
+
+        // 2. 메인 키보드 오른쪽 (주소 0x22)
+        matrix_main_right {
+            kscan = <&kscan_main_right>;
+            row-offset = <0>;
+            col-offset = <8>;
+        };
+
+        // 3. 방향키 및 기능키 (주소 0x21)
+        matrix_arrow_func {
+            kscan = <&kscan_arrow_func>;
+            row-offset = <0>;
+            col-offset = <15>;
+        };
+
+        // 4. 넘패드 (주소 0x20)
+        matrix_numpad {
+            kscan = <&kscan_numpad>;
+            row-offset = <0>;
+            col-offset = <18>;
+        };
+    };
+
+    // --- 각 하드웨어 파트별 핀 매핑 세부 설정 ---
+
+    // 메인 왼쪽 (행 6개 x 열 8개)
+    kscan_main_left: kscan_main_left {
+        compatible = "zmk,kscan-gpio-matrix";
+        diode-direction = "col2row";
+        row-gpios
+            = <&io_main_left 15 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 1
+            , <&io_main_left 14 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 2
+            , <&io_main_left 13 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 3
+            , <&io_main_left 12 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 4
+            , <&io_main_left 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 5
+            , <&io_main_left 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 6
+            ;
+        col-gpios
+            = <&io_main_left 7 GPIO_ACTIVE_HIGH> // col 1
+            , <&io_main_left 6 GPIO_ACTIVE_HIGH> // col 2
+            , <&io_main_left 5 GPIO_ACTIVE_HIGH> // col 3
+            , <&io_main_left 4 GPIO_ACTIVE_HIGH> // col 4
+            , <&io_main_left 3 GPIO_ACTIVE_HIGH> // col 5
+            , <&io_main_left 2 GPIO_ACTIVE_HIGH> // col 6
+            , <&io_main_left 1 GPIO_ACTIVE_HIGH> // col 7
+            , <&io_main_left 0 GPIO_ACTIVE_HIGH> // col 8
+            ;
+    };
+
+    // 메인 오른쪽 (행 6개 x 열 7개)
+    kscan_main_right: kscan_main_right {
+        compatible = "zmk,kscan-gpio-matrix";
+        diode-direction = "col2row";
+        row-gpios
+            = <&io_main_right 15 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 1
+            , <&io_main_right 14 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 2
+            , <&io_main_right 13 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 3
+            , <&io_main_right 12 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 4
+            , <&io_main_right 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 5
+            , <&io_main_right 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 6
+            ;
+        col-gpios
+            = <&io_main_right 7 GPIO_ACTIVE_HIGH> // col 1
+            , <&io_main_right 6 GPIO_ACTIVE_HIGH> // col 2
+            , <&io_main_right 5 GPIO_ACTIVE_HIGH> // col 3
+            , <&io_main_right 4 GPIO_ACTIVE_HIGH> // col 4
+            , <&io_main_right 3 GPIO_ACTIVE_HIGH> // col 5
+            , <&io_main_right 2 GPIO_ACTIVE_HIGH> // col 6
+            , <&io_main_right 1 GPIO_ACTIVE_HIGH> // col 7
+            ;
+    };
+
+    // 방향키 및 기능키 (행 5개 x 열 3개)
+    kscan_arrow_func: kscan_arrow_func {
+        compatible = "zmk,kscan-gpio-matrix";
+        diode-direction = "col2row";
+        row-gpios
+            = <&io_arrow_func 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 1
+            , <&io_arrow_func 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 2
+            , <&io_arrow_func 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 3
+            , <&io_arrow_func 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 4
+            , <&io_arrow_func 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 5
+            ;
+        col-gpios
+            = <&io_arrow_func 10 GPIO_ACTIVE_HIGH> // col 1
+            , <&io_arrow_func 11 GPIO_ACTIVE_HIGH> // col 2
+            , <&io_arrow_func 12 GPIO_ACTIVE_HIGH> // col 3
+            ;
+    };
+
+    // 넘패드 (행 5개 x 열 4개)
+    kscan_numpad: kscan_numpad {
+        compatible = "zmk,kscan-gpio-matrix";
+        diode-direction = "col2row";
+        row-gpios
+            = <&io_numpad 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 1
+            , <&io_numpad 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 2
+            , <&io_numpad 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 4
+            , <&io_numpad 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 5
+            , <&io_numpad 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // row 5-2
+            ;
+        col-gpios
+            = <&io_numpad 7 GPIO_ACTIVE_HIGH>  // col 1
+            , <&io_numpad 12 GPIO_ACTIVE_HIGH> // col 2
+            , <&io_numpad 11 GPIO_ACTIVE_HIGH> // col 3
+            , <&io_numpad 10 GPIO_ACTIVE_HIGH> // col 4
+            ;
+    };
+};
+
+// --- nice!nano I2C 하드웨어 포트 활성화 및 주소 세팅 (D8=SCL, D9=SDA) ---
+&pro_micro_i2c {
+    status = "okay";
+    scl-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+    sda-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+
+    // 넘패드 (A2:GND, A1:GND, A0:GND -> 주소 0x20)
+    io_numpad: tca9555@20 {
+        compatible = "nxp,pca9555";
+        reg = <0x20>;
+        label = "TCA9555_NUMPAD";
+        gpio-controller;
+        #gpio-cells = <2>;
+    };
+
+    // 방향키/기능키 (A2:GND, A1:GND, A0:3.3V -> 주소 0x21)
+    io_arrow_func: tca9555@21 {
+        compatible = "nxp,pca9555";
+        reg = <0x21>;
+        label = "TCA9555_ARROW_FUNC";
+        gpio-controller;
+        #gpio-cells = <2>;
+    };
+
+    // 메인 키보드 오른쪽 (A2:GND, A1:3.3V, A0:GND -> 주소 0x22)
+    io_main_right: tca9555@22 {
+        compatible = "nxp,pca9555";
+        reg = <0x22>;
+        label = "TCA9555_MAIN_RIGHT";
+        gpio-controller;
+        #gpio-cells = <2>;
+    };
+
+    // 메인 키보드 왼쪽 (A2:GND, A1:3.3V, A0:3.3V -> 주소 0x23)
+    io_main_left: tca9555@23 {
+        compatible = "nxp,pca9555";
+        reg = <0x23>;
+        label = "TCA9555_MAIN_LEFT";
+        gpio-controller;
+        #gpio-cells = <2>;
+    };
+};

@@ -1,7 +1,7 @@
 if SHIELD_G_MYKEYBOARD_104_SPLIT
 
 config ZMK_KEYBOARD_NAME
-    default "G_mykeyboard_104"
+    default "GKB104"
 
 config I2C
     default y

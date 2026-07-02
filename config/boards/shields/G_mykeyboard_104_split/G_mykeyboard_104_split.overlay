@@ -1,14 +1,28 @@
-&i2c1 {
-    status = "okay";
+#include <dt-bindings/zmk/matrix_transform.h>
+#include <zephyr/dt-bindings/gpio/gpio.h>
 
-    clock-frequency = <I2C_BITRATE_STANDARD>;
+/ {
+    chosen {
+        zmk,kscan = &kscan0;
+        zmk,matrix-transform = &default_transform;
+    };
 
-    tca9555_u1: tca9555@20 {
-        compatible = "nxp,pca9555";
-        reg = <0x20>;
-        gpio-controller;
-        #gpio-cells = <2>;
-        ngpios = <16>;
-        status = "okay";
+    kscan0: kscan {
+        compatible = "zmk,kscan-gpio-matrix";
+        diode-direction = "col2row";
+
+        row-gpios = <&pro_micro 10 GPIO_ACTIVE_HIGH>;
+        col-gpios = <&pro_micro 16 GPIO_ACTIVE_HIGH>;
+    };
+
+    default_transform: matrix_transform {
+        compatible = "zmk,matrix-transform";
+
+        rows = <1>;
+        columns = <1>;
+
+        map = <
+            RC(0,0)
+        >;
     };
 };
